@@ -29,6 +29,7 @@ interface CampaignAnalytics {
 interface CampaignData {
   campaignDetails: CampaignDetails | null;
   campaignAnalytics: CampaignAnalytics | null;
+  // totalLeads is still provided from the API, but we won't use it
   totalLeads: number;
 }
 
@@ -46,8 +47,8 @@ async function getCampaignData(): Promise<CampaignData> {
 }
 
 export default async function Page() {
-  const { campaignDetails, campaignAnalytics, totalLeads } =
-    await getCampaignData();
+  // Destructure totalLeads even if we won't use it, or remove it if not needed
+  const { campaignDetails, campaignAnalytics } = await getCampaignData();
 
   // Campaign title and details
   const campaignName = campaignDetails?.name || "Campaign Results";
@@ -81,12 +82,13 @@ export default async function Page() {
   }
 
   // Campaign Performance Metrics
-  // Display totalLeads from the API response
+  // Hard-code Total Leads to 100 instead of using totalLeads from the API
+  const hardCodedTotalLeads = 100;
   const emailsSent = campaignAnalytics?.emails_sent_count ?? 0;
   const replies = campaignAnalytics?.reply_count ?? 0;
   const replyRate = emailsSent > 0 ? (replies / emailsSent) * 100 : 0;
 
-  // Progress calculation based on completed_count vs. leads_count
+  // Progress calculation based on completed_count vs. leads_count (from campaignAnalytics)
   const progress =
     campaignAnalytics && campaignAnalytics.leads_count
       ? (campaignAnalytics.completed_count || 0) / campaignAnalytics.leads_count
@@ -131,7 +133,9 @@ export default async function Page() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-5 rounded-lg shadow hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-blue-500">
           <div className="text-gray-700">Total Leads</div>
-          <div className="text-3xl font-bold text-blue-500">100</div>
+          <div className="text-3xl font-bold text-blue-500">
+            {hardCodedTotalLeads}
+          </div>
         </div>
         <div className="bg-white p-5 rounded-lg shadow hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-blue-500">
           <div className="text-gray-700">Emails Sent</div>
